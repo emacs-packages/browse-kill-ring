@@ -211,6 +211,33 @@ can disable it by setting this to nil."
   :type 'boolean
   :group 'browse-kill-ring)
 
+(defcustom browse-kill-ring-insert-function nil
+  "Optional function to insert text selected from the kill ring.
+When non-nil, this function is used by `browse-kill-ring-do-insert'
+instead of the default `insert-for-yank'.
+
+The function is called with a single argument STR, the string to
+insert.  STR is the authoritative text to be inserted.
+
+The function must insert STR into the current buffer and return a
+cons cell (BEG . END) indicating the bounds of the inserted text,
+where BEG and END are buffer positions and END is exclusive.
+These bounds are used to highlight the inserted region.  Return
+nil to skip highlighting.
+
+The function is called with `deactivate-mark' dynamically bound
+to nil.  It should not switch buffers or windows.
+
+This setting only affects normal insertion via
+`browse-kill-ring-do-insert'.  Prepend and append insertions
+always use `insert-for-yank'.
+
+This is primarily intended for Evil users who want paste-after-point
+behavior."
+  :type '(choice (const :tag "Default (insert-for-yank)" nil)
+                 function)
+  :group 'browse-kill-ring)
+
 (defvar browse-kill-ring-original-window-config nil
   "The window configuration to restore for `browse-kill-ring-quit'.")
 (make-variable-buffer-local 'browse-kill-ring-original-window-config)
@@ -540,7 +567,12 @@ case return nil."
                 (not buffer-read-only)
                 transient-mark-mode mark-active)
        (delete-active-region))
-     (browse-kill-ring-insert-and-highlight str))))
+     (if browse-kill-ring-insert-function
+         (let* (deactivate-mark
+               (bounds (funcall browse-kill-ring-insert-function str)))
+           (when bounds
+             (browse-kill-ring-highlight-inserted (car bounds) (cdr bounds))))
+       (browse-kill-ring-insert-and-highlight str)))))
 
 (defun browse-kill-ring-update-highlighed-entry ()
   (when browse-kill-ring-highlight-current-entry
