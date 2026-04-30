@@ -228,12 +228,16 @@ nil to skip highlighting.
 The function is called with `deactivate-mark' dynamically bound
 to nil.  It should not switch buffers or windows.
 
-This setting only affects normal insertion via
-`browse-kill-ring-do-insert'.  Prepend and append insertions
-always use `insert-for-yank'.
+This setting affects normal insertion via
+`browse-kill-ring-do-insert' and the preview overlay position.
+Prepend and append insertions always use `insert-for-yank'.
+When this variable is non-nil, the preview overlay is shown after
+point instead of before point, to match paste-after-point
+semantics.
 
 This is primarily intended for Evil users who want paste-after-point
-behavior."
+behavior.  The convenience function `browse-kill-ring-evil-insert'
+is provided for this purpose."
   :type '(choice (const :tag "Default (insert-for-yank)" nil)
                  function)
   :group 'browse-kill-ring)
@@ -554,6 +558,28 @@ case return nil."
         (overlay-get o 'browse-kill-ring-target)
       (unless no-error
         (error "No kill ring item here")))))
+
+(defun browse-kill-ring--preview-point ()
+  "Return the buffer position for the preview overlay.
+When `browse-kill-ring-insert-function' is non-nil, returns a
+position after point to match paste-after-point semantics.
+Otherwise returns point for default insert-at-point behavior."
+  (if browse-kill-ring-insert-function
+      (min (1+ (point)) (point-max))
+    (point)))
+
+(defun browse-kill-ring-evil-insert (str)
+  "Insert STR using `evil-paste-after' for Vim-style paste behavior.
+Intended for use as the value of `browse-kill-ring-insert-function'.
+Requires the `evil' package."
+  (let ((kill-ring (list str))
+        (kill-ring-yank-pointer (list str))
+        (interprogram-paste-function nil))
+    (evil-paste-after 1))
+  (let ((beg (evil-get-marker ?\[))
+        (end (evil-get-marker ?\])))
+    (when (and beg end)
+      (cons beg (1+ end)))))
 
 (defun browse-kill-ring-do-insert (buf pt quit)
   (let ((str (browse-kill-ring-current-string buf pt)))
@@ -1057,10 +1083,10 @@ it's turned on."
                (region-active-p)))
            (start (if will-replace
                       (min (point) (mark))
-                    (point)))
+                    (browse-kill-ring--preview-point)))
            (end (if will-replace
                     (max (point) (mark))
-                  (point))))
+                  (browse-kill-ring--preview-point))))
       (when browse-kill-ring-show-preview
         (browse-kill-ring-clear-preview)
         (setq browse-kill-ring-preview-overlay
