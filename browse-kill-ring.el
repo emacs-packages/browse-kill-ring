@@ -8,6 +8,7 @@
 ;; Version: 2.1.0
 ;; URL: https://github.com/browse-kill-ring/browse-kill-ring
 ;; Keywords: convenience
+;; Package-Requires: ((evil "1.0.0"))
 
 ;; This file is not currently part of GNU Emacs.
 
@@ -49,6 +50,8 @@
 (eval-when-compile
   (require 'cl-lib))
 (require 'delsel)
+
+(require 'evil)
 
 (defgroup browse-kill-ring nil
   "A package for browsing and inserting the items in `kill-ring'."
