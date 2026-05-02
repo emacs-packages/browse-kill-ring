@@ -505,9 +505,9 @@ of the *Kill Ring*."
               (next (next-single-property-change (point) 'browse-kill-ring-extra)))
           (when prev (cl-incf prev))
           (when next (cl-incf next))
-          (delete-region (or prev (point-min)) (or next (point-max))))))))
-  (browse-kill-ring-resize-window)
-  (browse-kill-ring-forward 0))
+          (delete-region (or prev (point-min)) (or next (point-max)))))))
+    (browse-kill-ring-resize-window)
+    (browse-kill-ring-forward 0)))
 
 ;; code from browse-kill-ring+.el
 (defun browse-kill-ring-target-overlay-at (position &optional no-error)
