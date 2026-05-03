@@ -1071,9 +1071,10 @@ it's turned on."
               ;; display leftmost or rightmost duplicate.
               ;; if `browse-kill-ring-display-leftmost-duplicate' is t,
               ;; display leftmost(last) duplicate.
-              (cl-delete-duplicates items
-                                 :test #'equal
-                                 :from-end browse-kill-ring-display-leftmost-duplicate))
+              (setq items
+                    (cl-delete-duplicates items
+                                          :test #'equal
+                                          :from-end browse-kill-ring-display-leftmost-duplicate)))
             (when (stringp regexp)
               (setq items (delq nil
                                 (mapcar
