@@ -1,3 +1,9 @@
+2026-05-03 Andrew Burgess <aburgess@redhat.com>
+	v2.1 release:
+	Enable lexical binding, switch from cl to cl-lib, fix some
+	byte-compiler warnings.  In default key bindings, C-g now quits
+	from browse-kill-ring.  Other small fixes.
+
 2026-05-01 Sergey Goldgaber <large.chart5044@fastmail.com>
 	Replace obsolete defadvice with advice-add for yank-pop.  The
 	minimum Emacs version is now 24.4.
