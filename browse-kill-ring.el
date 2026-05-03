@@ -1101,7 +1101,6 @@ it's turned on."
               (add-hook 'post-command-hook
                         'browse-kill-ring-update-highlighed-entry
                         nil t))
-;; Code from Michael Slass <mikesl@wrq.com>
             (message
              (let ((entry (if (= 1 (length kill-ring)) "entry" "entries")))
                (concat
@@ -1114,7 +1113,6 @@ it's turned on."
                 (substitute-command-keys
                  (concat "    Type \\[browse-kill-ring-quit] to quit.  "
                          "\\[describe-mode] for help.")))))
-;; End code from Michael Slass <mikesl@wrq.com>
             (set-buffer-modified-p nil)
             (goto-char (point-min))
             (browse-kill-ring-forward 0)
